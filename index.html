@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Encuesta UNEMI</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+  <!-- FontAwesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Estilos Personalizados -->
+  <style>
+      body {
+          font-family: 'Roboto','Open Sans', Arial, sans-serif;
+          background-color: #ffffff;
+          color: #002E45;
+      }
+      .franja-superior {
+          background-color: #002E45;
+          color: white;
+          height: 60px;
+      }
+      .logo-tigre, .logo-unemi {
+          height: 50px;
+          object-fit: contain;
+      }
+      .franja-naranja {
+          height: 10px;
+          background-color: #FF6900;
+      }
+      .container-capacit {
+        max-width: 980px; margin: auto;
+      }
+      /* Ocultar sección de preguntas inicialmente */
+      #seccionPreguntas {
+        display: none;
+        max-width: 800px;
+        margin: auto;
+      }
+        .rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 10px;
+        }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            font-size: 32px;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        /* HOVER */
+        .rating label:hover,
+        .rating label:hover ~ label {
+            color: #FFCC00;
+        }
+
+        /* SELECCIÓN */
+        .rating input:checked ~ label {
+            color: #FFCC00;
+        }
+
+        /* CARD DESLIZA HACIA LA IZQUIERDA (ocultando) */
+        .slide-out-left {
+            animation: slideOutLeft 0.4s forwards;
+        }
+
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
+
+        /* CARD DESLIZA DESDE LA DERECHA (mostrando) */
+        .slide-in-right {
+            animation: slideInRight 0.3s forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .error-pregunta {
+            border: 2px solid #dc3545 !important; 
+            border-radius: 8px;
+            padding: 8px;
+            background-color: #ffe6e6;
+        }
+
+  </style>
+</head>
+
+<body class="bg-light">
+
+<!-- Encabezado -->
+<div class="franja-superior d-flex justify-content-between align-items-center px-3">
+    <!-- Izquierda -->
+    <div class="d-flex align-items-center">
+      <img src="https://dac-ftd.github.io/pry-admin/img/logo-unemi.png" alt="Logo" class="logo-tigre">
+    </div>
+
+    <!-- Derecha -->
+    <div class="d-flex align-items-center justify-content-end">
+        <img src="https://dac-ftd.github.io/pry-admin/img/unemi-logo.png" alt="Logo unemi" class="logo-unemi">
+    </div>
+</div>
+<div class="franja-naranja"></div>
+
+<div class="container container-capacit mt-3 mb-2">
+  
+  <!-- Tarjeta de Título -->
+  <div id="cardInicial" class="card shadow pt-2 mb-3">
+    <h4 class="mt-1 px-2 fw-bold text-center">Encuesta Satisfacción Profesores</h4>
+    <div class="row ">
+        <div class="col-12">
+            <p class="text-secondary px-4" style="font-size: 14px; text-align:justify;">
+                Nuestro objetivo es conocer su percepción sobre los servicios institucionales que reciben, con el fin de identificar áreas de mejora, fortalecer los procesos de apoyo académico y administrativo, y comprender cómo estos servicios influyen en el desarrollo de su labor dentro de la universidad.
+            </p>
+        </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta de Selección de Carrera -->
+  <div id="cardCabecera"  class="card shadow">
+    <div class="card-body p-4">
+      <form id="formularioEncuesta">
+        
+        <!-- Fila de Selects -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="selectFacultad" class="form-label fw-bold">Facultad:</label>
+                <select id="selectFacultad" class="form-select select2" style="width: 100%;">
+                    <option value="">Seleccione una facultad</option>
+                    <!-- Los values deben ser códigos únicos -->
+                    <option value="FACE">FACE - Educación</option>
+                    <option value="FACI">FACI - Ciencias e Ingeniería</option>
+                    <option value="FACS">FACS - Salud y Servicios Sociales</option>
+                    <option value="FACSECYD">FACSECYD  - Ciencias Sociales, Educación Comercial y Derecho </option>
+                </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="selectCarrera" class="form-label fw-bold">Carrera:</label>
+                <select id="selectCarrera" class="form-select select2" style="width: 100%;" disabled>
+                    <option value="">Seleccione primero una facultad</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 m-b3">
+                <label for="selectDedicacion" class="form-label fw-bold">Dedicación:</label>
+                <select id="selectDedicacion" class="form-select select2" style="width: 100%;">
+                    <option value=""> </option>
+                    <!-- Los values deben ser códigos únicos -->
+                    <option value="Tiempo completo Ocasional">Tiempo completo Ocasional</option>
+                    <option value="Medio tiempo Ocasional">Medio tiempo Ocasional</option>
+                    <option value="Tiempo completo Titular">Tiempo completo Titular</option>
+                    <option value="Medio tiempo Titular">Medio tiempo Titular</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="selectGenero" class="form-label fw-bold">Genero:</label>
+                <select id="selectGenero" class="form-select select2" style="width: 100%;">
+                    <option value="">Seleccione un genero</option>
+                    <option >Masculino</option>
+                    <option >Femenino</option>
+                </select>
+            </div>
+          </div>
+
+        <!-- Botón para continuar -->
+        <div class="text-left mt-3">
+            <button type="button" id="btnContinuar" class="btn btn-primary" disabled>
+                Continuar  <i class="fa-solid fa-angle-right"></i>
+            </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Sección de Preguntas (Oculta al principio) -->
+  <div id="seccionPreguntas" class="mt-4">
+    <div class="card shadow px-4">
+        <h5 class="fw-bold mt-3">¿Qué tán satisfecho está?</h5> 
+        <p class="text-secondary"><strong>Escala de calificación</strong><br>
+            Para calificar utilice la escala del 1 al 5, donde: <br>
+            Menor calificación: ⭐<br>
+            Mayor calificación: ⭐⭐⭐⭐⭐
+        </p>
+    </div>
+
+    <div class="card shadow mt-4 py-3 px-4">
+        <div class="mb-4">
+            <p>1. Apoyo que recibe para realizar sus actividades académicas.*</p>
+            <div class="text-center mb-2">
+                <span style="padding-right: 5.5rem;">1</span>
+                <span style="padding-right: 5.5rem;">2</span>
+                <span style="padding-right: 5.5rem;">3</span>
+                <span style="padding-right: 5.5rem;">4</span>
+                <span>5</span>
+            </div>
+            <div class="rating">
+                <input type="radio" id="p1-1" name="p1" value="1">
+                <label for="p1-1">★</label>
+                <input type="radio" id="p1-2" name="p1" value="2">
+                <label for="p1-2" style="padding-right: 3rem;">★</label>
+                <input type="radio" id="p1-3" name="p1" value="3">
+                <label for="p1-3" style="padding-right: 3rem;">★</label>
+                <input type="radio" id="p1-4" name="p1" value="4">
+                <label for="p1-4" style="padding-right: 3rem;">★</label>
+                <input type="radio" id="p1-5" name="p1" value="5">
+                <label for="p1-5" style="padding-right: 3rem;">★</label>
+            </div>
+        </div>
+
+            <div class="mb-4">
+                <p>2. Cantidad de estudiantes asignados en los cursos que imparte*</p>
+                <div class="text-center mb-2">
+                    <span style="padding-right: 5.5rem;">1</span>
+                    <span style="padding-right: 5.5rem;">2</span>
+                    <span style="padding-right: 5.5rem;">3</span>
+                    <span style="padding-right: 5.5rem;">4</span>
+                    <span>5</span>
+                </div>
+                <div class="rating">
+                    <input type="radio" id="p2-1" name="p2" value="1">
+                    <label for="p2-1">★</label>
+                    <input type="radio" id="p2-2" name="p2" value="2">
+                    <label for="p2-2" style="padding-right: 3rem;">★</label>
+                    <input type="radio" id="p2-3" name="p2" value="3">
+                    <label for="p2-3" style="padding-right: 3rem;">★</label>
+                    <input type="radio" id="p2-4" name="p2" value="4">
+                    <label for="p2-4" style="padding-right: 3rem;">★</label>
+                    <input type="radio" id="p2-5" name="p2" value="5">
+                    <label for="p2-5" style="padding-right: 3rem;">★</label>
+                </div>
+          </div>
+          <div class="mb-4">
+                <p>3. Soporte técnico y conectividad institucional.*</p>
+                <div class="text-center mb-2">
+                    <span style="padding-right: 5.5rem;">1</span>
+                    <span style="padding-right: 5.5rem;">2</span>
+                    <span style="padding-right: 5.5rem;">3</span>
+                    <span style="padding-right: 5.5rem;">4</span>
+                    <span>5</span>
+                </div>
+                <div class="rating">
+                    <input type="radio" id="p3-1" name="p3" value="1">
+                    <label for="p3-1">★</label>
+                    <input type="radio" id="p3-2" name="p3" value="2">
+                    <label for="p3-2" style="padding-right: 3rem;">★</label>
+                    <input type="radio" id="p3-3" name="p3" value="3">
+                    <label for="p3-3" style="padding-right: 3rem;">★</label>
+                    <input type="radio" id="p3-4" name="p3" value="4">
+                    <label for="p3-4" style="padding-right: 3rem;">★</label>
+                    <input type="radio" id="p3-5" name="p3" value="5">
+                    <label for="p3-5" style="padding-right: 3rem;">★</label>
+                </div>
+          </div>
+        <div class="mb-4">
+            <p>4. Incentivos para participar en eventos académicos o de investigación.*</p>
+            <div class="text-center mb-2">
+                    <span style="padding-right: 5.5rem;">1</span>
+                    <span style="padding-right: 5.5rem;">2</span>
+                    <span style="padding-right: 5.5rem;">3</span>
+                    <span style="padding-right: 5.5rem;">4</span>
+                    <span>5</span>
+                </div>
+                <div class="rating">
+                    <input type="radio" id="p4-1" name="p4" value="1">
+                    <label for="p4-1">★</label>
+                    <input type="radio" id="p4-2" name="p4" value="2">
+                    <label for="p4-2" style="padding-right: 3rem;">★</label>
+                    <input type="radio" id="p4-3" name="p4" value="3">
+                    <label for="p4-3" style="padding-right: 3rem;">★</label>
+                    <input type="radio" id="p4-4" name="p4" value="4">
+                    <label for="p4-4" style="padding-right: 3rem;">★</label>
+                    <input type="radio" id="p4-5" name="p4" value="5">
+                    <label for="p4-5" style="padding-right: 3rem;">★</label>
+                </div>
+        </div>
+        <div class="mb-4">
+            <p>5. Retroalimentación recibida tras los procesos de evaluación.*</p>
+            <div class="text-center mb-2">
+                <span style="padding-right: 5.5rem;">1</span>
+                <span style="padding-right: 5.5rem;">2</span>
+                <span style="padding-right: 5.5rem;">3</span>
+                <span style="padding-right: 5.5rem;">4</span>
+                <span>5</span>
+            </div>
+            <div class="rating">
+                <input type="radio" id="p5-1" name="p5" value="1">
+                <label for="p5-1">★</label>
+                <input type="radio" id="p5-2" name="p5" value="2">
+                <label for="p5-2" style="padding-right: 3rem;">★</label>
+                <input type="radio" id="p5-3" name="p5" value="3">
+                <label for="p5-3" style="padding-right: 3rem;">★</label>
+                <input type="radio" id="p5-4" name="p5" value="4">
+                <label for="p5-4" style="padding-right: 3rem;">★</label>
+                <input type="radio" id="p5-5" name="p5" value="5">
+                <label for="p5-5" style="padding-right: 3rem;">★</label>
+            </div>
+        </div>
+        <div class="mb-4">
+            <p>6. Apoyo institucional para el desarrollo de proyectos de investigación.*</p>
+            <div class="text-center mb-2">
+                <span style="padding-right: 5.5rem;">1</span>
+                <span style="padding-right: 5.5rem;">2</span>
+                <span style="padding-right: 5.5rem;">3</span>
+                <span style="padding-right: 5.5rem;">4</span>
+                <span>5</span>
+            </div>
+            <div class="rating">
+                <input type="radio" id="p6-1" name="p6" value="1">
+                <label for="p6-1">★</label>
+                <input type="radio" id="p6-2" name="p6" value="2">
+                <label for="p6-2" style="padding-right: 3rem;">★</label>
+                <input type="radio" id="p6-3" name="p6" value="3">
+                <label for="p6-3" style="padding-right: 3rem;">★</label>
+                <input type="radio" id="p6-4" name="p6" value="4">
+                <label for="p6-4" style="padding-right: 3rem;">★</label>
+                <input type="radio" id="p6-5" name="p6" value="5">
+                <label for="p6-5" style="padding-right: 3rem;">★</label>
+            </div>
+        </div>
+
+        <div class="text-end mt-3 mb-3">
+            <button id="btnFinalizar" class="btn btn-success btn-lg">
+                Finalizar Encuesta
+            </button>
+        </div>
+      </div>
+  </div>
+
+</div>
+
+<!-- JS Libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script>
+
+    
+    $(document).ready(function() {
+    if (localStorage.getItem("encuestaRealizada") === "true") {
+        Swal.fire({
+            icon: "info",
+            title: "Encuesta ya realizada",
+            text: "Usted ya completó esta encuesta.",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        });
+
+        // Bloquear interacción
+        $('body').css('pointer-events', 'none');
+       // $('body').css('opacity', '0.6');
+        }
+
+        // 1. Inicializar Select2 con tema de Bootstrap 5
+        $('.select2').select2({
+            theme: 'bootstrap-5',
+            placeholder: "Seleccione una opción",
+            allowClear: true
+        });
+
+        // 2. Base de datos de Carreras (Objeto JSON)
+        // Puedes agregar todas las carreras aquí
+        const baseDatosCarreras = {
+            "FACE": [
+                { id: "pafd", text: "Pedagogía de la Actividad Física y Deporte" },
+                { id: "edu_pre", text: "Educación modalidad presencial" },
+                { id: "edub_onl", text: "Educación Básica modalidad en línea" },
+                { id: "edues_pre", text: "Educación Especial modalidad presencial" },
+                { id: "eduini_smpre", text: "Educación Inicial modalidad semipresencial" },
+                { id: "eduini_onl", text: "Educación Inicial modalidad en línea" },
+                { id: "pine_onl", text: "Pedagogía de los Idiomas Nacionales y Extranjeros modalidad en línea" },
+                { id: "pll", text: "Pedagogía de la Lengua y Literatura" },
+                { id: "pce", text: "Pedagogía de las Ciencias Experimentales" },
+                { id: "pine_pre", text: "Pedagogía de los Idiomas Nacionales y Extranjeros modalidad presencial" }
+
+            ],
+            "FACI": [
+                { id: "soft", text: "Software" },
+                { id: "ind", text: "Industrial" },
+                { id: "amb", text: "Ambiental" },
+                { id: "ali", text: "Alimentos" },
+                { id: "ti", text: "Tecnologías de la Información" },
+                { id: "bio", text: "Biotecnología" },
+                { id: "arq", text: "Arquitectura Sostenible" }
+
+            ],
+            "FACS": [
+                { id: "enf", text: "Enfermería" },
+                { id: "nut", text: "Nutrición y Dietética" },
+                { id: "med", text: "Medicina" },
+                { id: "fis", text: "Fisioterapia" }
+            ],
+            "FACSECYD": [
+                { id: "cont", text: "Contabilidad y Auditoría " },
+                { id: "adm_onl", text: "Administración de Empresas modalidad en línea " },
+                { id: "adm_pre", text: "Administración de Empresas modalidad presencial " },
+                { id: "com_onl", text: "Comunicación modalidad en línea" },
+                { id: "com_pre", text: "Comunicación modalidad presencial" },
+                { id: "der", text: "Derecho" },
+                { id: "eco_onl", text: "Economía modalidad en línea" },
+                { id: "eco_pre", text: "Economía modalidad presencial" },
+                { id: "psi_pre", text: "Psicología modalidad presencial" },
+                { id: "psi_onl", text: "Psicología modalidad en línea" },
+                { id: "mult", text: "Multimedia y Producción Audiovisual" },
+                { id: "tsoc_onl", text: "Trabajo social modalidad en línea" },
+                { id: "tsoc_spre", text: "Trabajo social modalidad semipresencial" },
+                { id: "tur_onl", text: "Turismo modalidad en línea " },
+                { id: "tur_pre", text: "Turismo modalidad presencial" },
+            ]
+        };
+
+        // 3. Evento: Cuando cambia la Facultad
+        $('#selectFacultad').on('change', function() {
+            const facultadSeleccionada = $(this).val();
+            const $selectCarrera = $('#selectCarrera');
+            const $btnContinuar = $('#btnContinuar');
+
+            // Limpiar el select de carreras
+            $selectCarrera.empty().trigger('change');
+            
+            // Ocultar preguntas si cambia la facultad
+            $('#seccionPreguntas').slideUp();
+            $btnContinuar.prop('disabled', true);
+
+            if (facultadSeleccionada && baseDatosCarreras[facultadSeleccionada]) {
+                // Habilitar select de carrera
+                $selectCarrera.prop('disabled', false);
+                
+                // Agregar opción por defecto
+                const defaultOption = new Option('Seleccione una carrera', '', true, true);
+                $selectCarrera.append(defaultOption);
+
+                // Cargar las carreras correspondientes
+                baseDatosCarreras[facultadSeleccionada].forEach(function(carrera) {
+                    const newOption = new Option(carrera.text, carrera.id, false, false);
+                    $selectCarrera.append(newOption);
+                });
+
+                // Actualizar Select2 para que muestre los cambios
+                $selectCarrera.trigger('change');
+            } else {
+                // Si no hay facultad, bloquear carrera
+                $selectCarrera.prop('disabled', true);
+                const defaultOption = new Option('Seleccione primero una facultad', '', true, true);
+                $selectCarrera.append(defaultOption).trigger('change');
+            }
+        });
+
+        // 4. Evento: Cuando selecciona carrera habilita botón
+            function validarCampos() {
+                const carrera = $('#selectCarrera').val();
+                const dedic = $('#selectDedicacion').val();
+                const gen = $('#selectGenero').val();
+
+                if (carrera && dedic && gen) {
+                    $('#btnContinuar').prop('disabled', false);
+                } else {
+                    $('#btnContinuar').prop('disabled', true);
+                }
+            }
+
+            // Ejecutar validación cada vez que se cambia un select
+            $('#selectCarrera, #selectDedicacion, #selectGenero').on('change', validarCampos);
+
+        // 5. Botón Continuar (Simulación de mostrar preguntas)
+    $('#btnContinuar').on('click', function() {
+        // Cards del inicio -> salida hacia la izquierda
+        $('#cardInicial').addClass('slide-out-left');
+        $('#cardCabecera').addClass('slide-out-left');
+
+        // Retraso para que aparezcan las preguntas luego de la salida
+        setTimeout(function() {
+            $('#cardInicial').hide();
+            $('#cardCabecera').hide();
+
+            // Mostrar sección preguntas entrando desde la derecha
+            $('#seccionPreguntas')
+                .show()
+                .addClass('slide-in-right');
+        }, 300); // igual tiempo que la animación
+            // Scroll suave
+        $('html, body').animate({
+            scrollTop: $("#seccionPreguntas").offset().top
+        }, 800);
+    });
+
+    // 6. Validación del botón Finalizar
+    $('#btnFinalizar').on('click', function () {
+
+    let preguntas = ["p1","p2","p3","p4","p5","p6"];
+    let primeraSinResponder = null;
+
+    preguntas.forEach(function(id) {
+        let grupo = $('input[name="' + id + '"]');
+        let contenedor = grupo.closest('.mb-4');
+
+        contenedor.removeClass('error-pregunta');
+
+        if (!grupo.is(':checked')) {
+            if (!primeraSinResponder) primeraSinResponder = contenedor;
+            contenedor.addClass('error-pregunta');
+        }
+    });
+
+    if (primeraSinResponder) {
+        $('html, body').animate({
+            scrollTop: primeraSinResponder.offset().top - 20
+        }, 600);
+
+        //alert("Por favor complete todas las preguntas antes de finalizar.");
+        Swal.fire({
+            icon: "error",
+            title: "Preguntas sin contestar!",
+            text: "Porfavor, responda todos las preguntas antes de enviar la encuesta.",
+            ConfirmButton: "Aceptar",
+            allowOutsideClick: false, // ❌ No permite cerrar haciendo clic afuera
+            allowEscapeKey: false,   // ❌ No permite cerrar con ESC
+            allowEnterKey: false
+        });
+        return;
+    }
+
+    // Mostrar pantalla de carga
+    $('#pantallaCargando').fadeIn(200);
+
+    // Datos del formulario
+    const data = {
+        facultad: $('#selectFacultad').val(),
+        carrera: $('#selectCarrera option:selected').text(),
+        dedicacion: $('#selectDedicacion').val(),
+        genero: $('#selectGenero').val(),
+        p1: $('input[name="p1"]:checked').val(),
+        p2: $('input[name="p2"]:checked').val(),
+        p3: $('input[name="p3"]:checked').val(),
+        p4: $('input[name="p4"]:checked').val(),
+        p5: $('input[name="p5"]:checked').val(),
+        p6: $('input[name="p6"]:checked').val(),
+    };
+
+    // 👉 Reemplaza con TU URL del Web App
+    const url = "https://script.google.com/macros/s/AKfycbzx-J4v5iBv7168crBq_sdbiA2z_X6XxEvTbehtMVKPAiuObL5U4-p8iXan2za3y5EAJQ/exec";
+
+    // Enviar datos al Google Sheet
+        fetch(url, {
+            method: "POST",
+            mode: "no-cors",   // ← evita CORS
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+    $('#pantallaCargando').fadeOut(200);
+    localStorage.setItem("encuestaRealizada", "true");
+    Swal.fire({
+        icon: "success",
+        title: "¡Encuesta enviada!",
+        text: "Gracias por su participación.",
+        showConfirmButton: false,
+        allowOutsideClick: false, // ❌ No permite cerrar haciendo clic afuera
+        allowEscapeKey: false,   // ❌ No permite cerrar con ESC
+        allowEnterKey: false
+    }).then(() => {
+        // Bloquear toda la pantalla
+        $('body').css('pointer-events', 'none');
+        $('body').css('opacity', '0.6');
+        });
+    })
+    .catch(err => {
+        $('#pantallaCargando').fadeOut(200);
+
+        Swal.fire({
+            icon: "error",
+            title: "Error inesperado",
+            text: err,
+            confirmButtonText: "Aceptar",
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        });
+});
+
+});
+
+    });
+</script>
+
+<!-- Pantalla de carga -->
+<div id="pantallaCargando" 
+     style="display:none;
+            position:fixed;
+            top:0; left:0; right:0; bottom:0;
+            background:rgba(255,255,255,0.9);
+            z-index:9999;
+            text-align:center;
+            padding-top:20%;">
+    <div class="spinner-border text-primary" role="status" style="width: 5rem; height: 5rem;"></div>
+    <h4 class="mt-3 text-primary">Enviando encuesta...</h4>
+</div>
+
+</body>
+</html>
