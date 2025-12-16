@@ -133,11 +133,12 @@
   
   <!-- Tarjeta de Título -->
   <div id="cardInicial" class="card shadow pt-2 mb-3">
-    <h4 class="mt-1 px-2 fw-bold text-center">Encuesta Satisfacción Docentes</h4>
+    <h4 class="mt-1 px-2 fw-bold text-center">Encuesta Satisfacción Docente</h4>
     <div class="row ">
         <div class="col-12">
             <p class="text-secondary px-4" style="font-size: 14px; text-align:justify;">
-                La Dirección de Aseguramiento de la Calidad realiza la presente encuesta con el propósito de conocer su percepción sobre los servicios institucionales que recibe. La información recopilada permitirá identificar oportunidades de mejora, fortalecer los procesos de apoyo académico y administrativo, y comprender cómo estos servicios contribuyen al desarrollo de su labor dentro de la universidad.            </p>
+            La Dirección de Aseguramiento de la Calidad pone a disposición la presente encuesta con el propósito de conocer la percepción del personal docente respecto a los servicios institucionales que recibe en el ejercicio de su labor. La información recopilada será fundamental para identificar oportunidades de mejora continua, fortalecer los procesos de apoyo académico y administrativo, y evaluar el impacto de estos servicios en el desarrollo profesional y en la calidad de la docencia universitaria.
+            </p>
         </div>
     </div>
   </div>
@@ -584,8 +585,8 @@
     localStorage.setItem("encuestaRealizada", "true");
     Swal.fire({
         icon: "success",
-        title: "¡Encuesta enviada!",
-        text: "Gracias por su participación.",
+        title: "!Gracias por su participación!",
+        html: '<p style="text-align: justify;">Su participación contribuirá directamente al fortalecimiento institucional y a la excelencia académica de nuestra universidad.</p>',
         showConfirmButton: false,
         allowOutsideClick: false, // ❌ No permite cerrar haciendo clic afuera
         allowEscapeKey: false,   // ❌ No permite cerrar con ESC
